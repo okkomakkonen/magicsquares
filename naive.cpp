@@ -2,7 +2,7 @@
 #include <cmath> // std::sqrt
 #include <ctime> // std::asctime, std::localtime
 #include <set> // std::set
-#define MAX 300
+#define MAX 200
 
 unsigned int transform(int number) {
   return number * number;
@@ -88,9 +88,9 @@ int main() {
           sq.erase(h);
           if (transform(g) + transform(h) + transform(i) != k) // bottom row
             continue;
-          if (transform(a) + transform(e) + transform(i) != k) // descending diagonal
-            continue;
-            
+          // if (transform(a) + transform(e) + transform(i) != k) // descending diagonal
+          //   continue;
+
           // This is a valid magic square
           result = std::time(nullptr); // Current time
           std::cout << std::asctime(std::localtime(&result));
