@@ -5,3 +5,7 @@ naive:
 better:
 	g++ better.cpp -o better.o
 	nohup ./better.o > squares.txt &
+
+best:
+	g++ best.cpp -o best.o
+	nohup ./best.o > squares.txt &
