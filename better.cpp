@@ -1,13 +1,20 @@
-#include <iostream>
-#include <cmath>
-#include <set>
-#include <ctime>
+#include <iostream> // std::cout, std::endl
+#include <cmath> // std::sqrt
+#include <set> // std::set
+#include <ctime> // std::time
+#include <map> // std::map
+#include <string> // std::string
 
-#define MAX 500
+#define MAX 1000
 
 // Find the factors of n
+// Complexity is sqrt(n)
 std::set<int> factors(int n) {
   std::set<int> res;
+  if (n < 0) {
+    res.insert(-1);
+    n *= -1;
+  }
   for (int i = 1; i <= (int) std::sqrt(n); i++) {
     if (n % i == 0) {
       res.insert(i);
@@ -17,6 +24,8 @@ std::set<int> factors(int n) {
   return res;
 }
 
+// Find the factors of n * m
+// Complexity is log(n)*log(m) + sqrt(n) + sqrt(m)
 std::set<int> factors(int n, int m) {
   std::set<int> res;
   for (auto i : factors(n)) {
@@ -27,12 +36,20 @@ std::set<int> factors(int n, int m) {
   return res;
 }
 
+// Calculate the square root if it is an integer, else return zero
 int inv(int candidate) {
   if (candidate < 0) return 0;
   int test = std::sqrt(candidate);
   if (test * test == candidate)
     return test;
   return 0;
+}
+
+void log(std::string message) {
+  std::time_t result = std::time(nullptr); // Current time
+  std::cout << std::asctime(std::localtime(&result));
+  std::cout << message << std::endl;
+  std::cout << std::endl;
 }
 
 void log_magic_square(int a, int b, int c,
@@ -51,41 +68,44 @@ void log_magic_square(int a, int b, int c,
 
 int main() {
 
-  std::time_t result = std::time(nullptr); // Current time
-  std::cout << std::asctime(std::localtime(&result));
-  std::cout << "Starting" << std::endl;
-  std::cout << std::endl;
+  log("Calculating factors");
 
-  int a, b, c, d, e, f, g, h, i, k, x, y, xy, z, xyz;
+  // Precompute all factors of numbers in [1, 4*MAX**2] in MAX**3 time
+  std::map<int, std::set<int>> facts;
+  for (int x = 1; x < 4 * MAX * MAX; x++) {
+    facts.insert({x, factors(x)});
+  }
+
+  log("Finding magic squares");
+
+  int a, b, c, d, e, f, g, h, i, k, x, y;
 
   std::set<int> sq;
 
   for (a = 1; a <= MAX; a++) {
     sq.insert(a);
-    for (x = 1; x <= 2 * MAX; x++) {
-      for (y = x % 2 ? 1 : 2; y < x; y += 2) {
-        b = (x + y) / 2;
-        d = (x - y) / 2;
-        if (sq.find(b) != sq.end() || sq.find(d) != sq.end() || b == d)
-          continue;
-        sq.insert(b);
+    for (b = 1; b <= MAX; b++) {
+      if (sq.find(b) != sq.end()) continue;
+      sq.insert(b);
+      for (d = 1; d <= MAX; d++) {
+        if (sq.find(d) != sq.end()) continue;
         sq.insert(d);
-        xy = x * y;
+        x = b + d;
+        y = b - d;
 
-        auto xy_factors = factors(x, y);
-        for (auto z : xy_factors) {
-          xyz = xy / z;
-          if (z % 2 != xyz % 2 || z <= xyz)
+        for (auto z : facts[x * y]) {
+          if (z % 2 != x * y / z % 2 || z <= x * y / z)
             continue;
-          g = (z + xyz) / 2;
-          c = (z - xyz) / 2;
-          if (sq.find(c) != sq.end() || sq.find(g) != sq.end() || c == g)
+          g = (z + x * y / z) / 2;
+          c = (z - x * y / z) / 2;
+          if (sq.find(c) != sq.end() || sq.find(g) != sq.end() || c <= 0 || g < 0)
             continue;
           sq.insert(c);
           sq.insert(g);
 
           k = a * a + b * b + c * c;
           if (a * a + d * d + g * g != k) {
+            std::cout << "What's happened here" << std::endl;
             sq.erase(c);
             sq.erase(g);
             continue;
@@ -135,23 +155,22 @@ int main() {
           if (a * a + e * e + i * i != k) // descending diagonal
             continue;
 
-          // This is a valid magic square
           // log_magic_square(a, b, c, d, e, f, g, h, i, k, a * a + e * e + i * i == k);
           log_magic_square(a, b, c, d, e, f, g, h, i, k);
         }
-        sq.erase(b);
+
         sq.erase(d);
       }
+      sq.erase(b);
     }
     sq.erase(a);
+    // Check that all elements are deleted from the square
     if (sq.size() != 0) {
       std::cout << "Something has gone wrong" << std::endl;
     }
   }
 
-  result = std::time(nullptr); // Current time
-  std::cout << std::asctime(std::localtime(&result));
-  std::cout << "Ending" << std::endl;
+  log("Ending");
 
   return 0;
 
