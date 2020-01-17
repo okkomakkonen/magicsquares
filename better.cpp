@@ -5,7 +5,7 @@
 #include <map> // std::map
 #include <string> // std::string
 
-#define MAX 1000
+#define MAX 10000
 
 // Find the factors of n
 // Complexity is sqrt(n)
@@ -80,56 +80,51 @@ int main() {
 
   int a, b, c, d, e, f, g, h, i, k, x, y;
 
-  std::set<int> sq;
+  std::set<int> sq; // Set of all numbers in the magic square
 
-  for (a = 1; a <= MAX; a++) {
-    sq.insert(a);
-    for (b = 1; b <= MAX; b++) {
-      if (sq.find(b) != sq.end()) continue;
-      sq.insert(b);
-      for (d = 1; d <= MAX; d++) {
-        if (sq.find(d) != sq.end()) continue;
-        sq.insert(d);
-        x = b + d;
-        y = b - d;
+  for (b = 1; b <= MAX; b++) { // b loop
+    sq.insert(b);
+    for (d = 1; d <= MAX; d++) { // d loop
+      if (sq.find(d) != sq.end()) continue;
+      sq.insert(d);
+      x = b + d;
+      y = b - d;
 
-        for (auto z : facts[x * y]) {
-          if (z % 2 != x * y / z % 2 || z <= x * y / z)
-            continue;
-          g = (z + x * y / z) / 2;
-          c = (z - x * y / z) / 2;
-          if (sq.find(c) != sq.end() || sq.find(g) != sq.end() || c <= 0 || g < 0)
-            continue;
-          sq.insert(c);
-          sq.insert(g);
+      for (auto z : facts[x * y]) { // factors loop
+        if (z % 2 != x * y / z % 2 || z <= x * y / z)
+          continue;
+        g = (z + x * y / z) / 2;
+        c = (z - x * y / z) / 2;
+        if (sq.find(c) != sq.end() || sq.find(g) != sq.end() || c <= 0 || g < 0)
+          continue;
+        sq.insert(c);
+        sq.insert(g);
 
+        for (a = 1; a <= MAX; a++) { // a loop
+          if (sq.find(a) != sq.end()) continue;
           k = a * a + b * b + c * c;
           if (a * a + d * d + g * g != k) {
-            std::cout << "What's happened here" << std::endl;
-            sq.erase(c);
-            sq.erase(g);
+            std::cout << "Some error has happened in the arithmetic" << std::endl;
             continue;
           }
+          sq.insert(a);
           // Now we can solve it to the end, since we have a, b, c, d and g
           e = inv(k - g * g - c * c);
           if (e == 0 || sq.find(e) != sq.end()) {
-            sq.erase(c);
-            sq.erase(g);
+            sq.erase(a);
             continue;
           }
           sq.insert(e);
           f = inv(k - d * d - e * e);
           if (f == 0 || sq.find(f) != sq.end()) {
-            sq.erase(c);
-            sq.erase(g);
+            sq.erase(a);
             sq.erase(e);
             continue;
           }
           sq.insert(f);
           h = inv(k - b * b - e * e);
           if (h == 0 || sq.find(h) != sq.end()) {
-            sq.erase(c);
-            sq.erase(g);
+            sq.erase(a);
             sq.erase(e);
             sq.erase(f);
             continue;
@@ -137,16 +132,14 @@ int main() {
           sq.insert(h);
           i = inv(k - c * c - f * f);
           if (i == 0 || sq.find(i) != sq.end()) {
-            sq.erase(c);
-            sq.erase(g);
+            sq.erase(a);
             sq.erase(e);
             sq.erase(f);
             sq.erase(h);
             continue;
           }
           // All elements are unique
-          sq.erase(c);
-          sq.erase(g);
+          sq.erase(a);
           sq.erase(e);
           sq.erase(f);
           sq.erase(h);
@@ -158,16 +151,14 @@ int main() {
           // log_magic_square(a, b, c, d, e, f, g, h, i, k, a * a + e * e + i * i == k);
           log_magic_square(a, b, c, d, e, f, g, h, i, k);
         }
-
-        sq.erase(d);
+        sq.erase(c);
+        sq.erase(g);
       }
-      sq.erase(b);
+      sq.erase(d);
     }
-    sq.erase(a);
-    // Check that all elements are deleted from the square
-    if (sq.size() != 0) {
-      std::cout << "Something has gone wrong" << std::endl;
-    }
+    sq.erase(b);
+    // Check that the square set is empty
+    if (sq.size()) std::cout << "All elements were not deleted from the square" << std::endl;
   }
 
   log("Ending");

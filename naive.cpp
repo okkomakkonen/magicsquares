@@ -2,7 +2,7 @@
 #include <cmath> // std::sqrt
 #include <ctime> // std::asctime, std::localtime
 #include <set> // std::set
-#define MAX 200
+#define MAX 100
 
 unsigned int transform(int number) {
   return number * number;
