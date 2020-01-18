@@ -6,7 +6,7 @@
 #include <string> // std::string
 #include "factors.hpp"
 
-#define MAX 300
+#define MAX 1000
 
 // Calculate the square root if it is an integer, else return zero
 int inv(int n) {
