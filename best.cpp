@@ -6,7 +6,7 @@
 #include <string> // std::string
 #include "factors.hpp"
 
-#define MAX 1000
+#define MAX 5000
 
 // Calculate the square root if it is an integer, else return zero
 int inv(int n) {
@@ -26,7 +26,7 @@ void log(std::string message) {
 }
 
 // Log a magic square to std::cout with a timestamp
-void log_magic_square(int a, int b, int c,
+void log(int a, int b, int c,
   int d, int e, int f, int g,
   int h, int i, int k) {
     std::time_t result = std::time(nullptr); // Current time
@@ -49,6 +49,8 @@ int main() {
   std::set<int> sq; // Set of all numbers in the magic square
 
   for (b = 1; b <= MAX; b++) { // b loop
+    if (b % 100 == 0)
+      std::cout << b << " out of " << MAX << std::endl;
     sq.insert(b);
     for (d = 1; d <= MAX; d++) { // d loop
       if (sq.find(d) != sq.end()) continue;
@@ -106,10 +108,10 @@ int main() {
           sq.erase(h);
           if (g * g + h * h + i * i != k) // bottom row
             continue;
-          // if (a * a + e * e + i * i != k) // descending diagonal
-          //   continue;
+          if (a * a + e * e + i * i != k) // descending diagonal
+            continue;
 
-          log_magic_square(a, b, c, d, e, f, g, h, i, k);
+          log(a, b, c, d, e, f, g, h, i, k);
         }
 
         sq.erase(c);
