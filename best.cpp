@@ -4,45 +4,20 @@
 #include <ctime> // std::time
 #include <map> // std::map
 #include <string> // std::string
+#include "factors.hpp"
 
-#define MAX 10000
-
-// Find the factors of n
-// Complexity is sqrt(n)
-std::set<int> factors(int n) {
-  std::set<int> res;
-  for (int i = 1; i <= (int) std::sqrt(n); i++) {
-    if (n % i == 0) {
-      res.insert(i);
-      res.insert(n / i);
-      res.insert(-i);
-      res.insert(-n / i);
-    }
-  }
-  return res;
-}
-
-// Find the factors of n * m
-// Complexity is log(n)*log(m) + sqrt(n) + sqrt(m)
-std::set<int> factors(int n, int m) {
-  std::set<int> res;
-  for (auto i : factors(n)) {
-    for (auto j : factors(m)) {
-      res.insert(i * j);
-    }
-  }
-  return res;
-}
+#define MAX 300
 
 // Calculate the square root if it is an integer, else return zero
-int inv(int candidate) {
-  if (candidate < 0) return 0;
-  int test = std::sqrt(candidate);
-  if (test * test == candidate)
-    return test;
+int inv(int n) {
+  if (n < 0) return 0;
+  int r = std::sqrt(n);
+  if (r * r == n)
+    return r;
   return 0;
 }
 
+// Log a string to std::cout with a timestamp
 void log(std::string message) {
   std::time_t result = std::time(nullptr); // Current time
   std::cout << std::asctime(std::localtime(&result));
@@ -50,43 +25,26 @@ void log(std::string message) {
   std::cout << std::endl;
 }
 
+// Log a magic square to std::cout with a timestamp
 void log_magic_square(int a, int b, int c,
   int d, int e, int f, int g,
-  int h, int i, int k, bool diagonal=false) {
+  int h, int i, int k) {
     std::time_t result = std::time(nullptr); // Current time
     std::cout << std::asctime(std::localtime(&result));
     std::cout << "Magic square of squares k = " << k << std::endl;
-    if (diagonal)
-      std::cout << "Working diagonal" << std::endl;
     std::cout << a << " " << b << " " << c << std::endl;
     std::cout << d << " " << e << " " << f << std::endl;
     std::cout << g << " " << h << " " << i << std::endl;
+    if (a * a + e * e + i * i == k)
+      std::cout << "WORKING MAGIC SQUARE OF SQUARES" << std::endl;
     std::cout << std::endl;
   }
 
 int main() {
 
-  // log("Calculating factors");
-
-  // Precompute all factors of numbers of form x * y for x, y in [-2N, 2N]
-  // std::map<int, std::set<int>> facts;
-  // for (int x = 2; x <= MAX*MAX/2 + MAX; x++) {
-  //   for (int y = -2*MAX; y <= MAX*MAX/2; y++) {
-  //     facts.insert({x*y, })
-  //   }
-  // }
-
-  // Precompute all factors of numbers in [1, 4*MAX**2] in MAX**3 time
-  // std::map<int, std::set<int>> facts;
-  // for (int x = 1; x < 4 * MAX * MAX; x++) {
-  //   facts.insert({x, factors(x)});
-  // }
-
   log("Finding magic squares");
 
   int a, b, c, d, e, f, g, h, i, k, x, y;
-
-  std::map<int, std::set<int>> facts;
 
   std::set<int> sq; // Set of all numbers in the magic square
 
@@ -96,11 +54,8 @@ int main() {
       if (sq.find(d) != sq.end()) continue;
       sq.insert(d);
 
-      if (facts.find((b+d)*(b-d)) == facts.end())
-        facts.insert({(b+d)*(b-d), factors(b+d, b-d)});
-
-      for (auto x : facts[(b+d)*(b-d)]) { // factors loop, facts[(b+d)*(b-d)]
-        if (x % 2 != (b+d)*(b-d) / x % 2 || x <= (b+d)*(b-d) / x) // invalid factor
+      for (auto x : factors((b+d)*(b-d))) { // factors loop
+        if (std::abs(x) % 2 != std::abs((b+d)*(b-d) / x) % 2) // invalid factor
           continue;
         g = (x + (b+d)*(b-d) / x) / 2;
         c = (x - (b+d)*(b-d) / x) / 2;
@@ -108,13 +63,9 @@ int main() {
           continue;
         sq.insert(c);
         sq.insert(g);
-        // Now we have b, c, d, g, (a + e)(a - e) = (g + c)(g - c)
 
-        if (facts.find((g+b)*(g-b)) == facts.end())
-          facts.insert({(g+b)*(g-b), factors(g+b, g-b)});
-
-        for (auto y : facts[(g+b)*(g-b)]) { // factors loop, facts[(g+b)*(g-b)]
-          if (y % 2 != (g+b)*(g-b) / y % 2 || y <= (g+b)*(g-b) / y) // invalid factor
+        for (auto y : factors((g+b)*(g-b))) { // factors loop
+          if (std::abs(y) % 2 != std::abs((g+b)*(g-b) / y) % 2) // invalid factor
             continue;
           a = (y + (g+b)*(g-b) / y) / 2;
           e = (y - (g+b)*(g-b) / y) / 2;
@@ -155,10 +106,9 @@ int main() {
           sq.erase(h);
           if (g * g + h * h + i * i != k) // bottom row
             continue;
-          if (a * a + e * e + i * i != k) // descending diagonal
-            continue;
+          // if (a * a + e * e + i * i != k) // descending diagonal
+          //   continue;
 
-          // log_magic_square(a, b, c, d, e, f, g, h, i, k, a * a + e * e + i * i == k);
           log_magic_square(a, b, c, d, e, f, g, h, i, k);
         }
 

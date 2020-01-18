@@ -1,11 +1,11 @@
 naive:
-	g++ naive.cpp -o naive.o
-	nohup ./naive.o > squares.txt &
+	g++ naive.cpp -o naive
+	nohup ./naive > squares.txt &
 
 better:
-	g++ better.cpp -o better.o
-	nohup ./better.o > squares.txt &
+	g++ better.cpp -o better
+	nohup ./better > squares.txt &
 
 best:
-	g++ best.cpp -o best.o
-	nohup ./best.o > squares.txt &
+	g++ best.cpp factors.cpp -o best
+	nohup ./best > squares.txt &
