@@ -1,11 +1,22 @@
+clean:
+	if [ -f "main" ]; then rm main; fi
+
 naive:
-	g++ naive.cpp -o naive
-	nohup ./naive > squares.txt &
+	make clean
+	g++ naive.cpp -o main
+	nohup ./main > squares.txt &
 
 better:
-	g++ better.cpp -o better
-	nohup ./better > squares.txt &
+	make clean
+	g++ better.cpp -o main
+	nohup ./main > squares.txt &
 
 best:
-	g++ best.cpp factors.cpp -o best
-	nohup ./best > squares.txt &
+	make clean
+	g++ best.cpp factors.cpp -o main
+	nohup ./main > squares.txt &
+
+new:
+	make clean
+	g++ new.cpp -o main
+	nohup ./main > squares.txt &

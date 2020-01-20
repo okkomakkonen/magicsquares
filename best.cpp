@@ -6,7 +6,7 @@
 #include <string> // std::string
 #include "factors.hpp"
 
-#define MAX 5000
+#define MAX 300
 
 // Calculate the square root if it is an integer, else return zero
 int inv(int n) {
@@ -38,9 +38,32 @@ void log(int a, int b, int c,
     if (a * a + e * e + i * i == k)
       std::cout << "WORKING MAGIC SQUARE OF SQUARES" << std::endl;
     std::cout << std::endl;
-  }
+}
+
+bool check_magic_square(int a, int b, int c,
+  int d, int e, int f, int g,
+  int h, int i) {
+    int k = a * a + b * b + c * c; // top row
+    if (d * d + e * e + f * f != k) // middle row
+      return false;
+    if (g * g + h * h + i * i != k) // bottom row
+      return false;
+    if (a * a + d * d + g * g != k) // left column
+      return false;
+    if (b * b + e * e + h * h != k) // middle column
+      return false;
+    if (c * c + f * f + i * i != k) // right column
+      return false;
+    if (a * a + e * e + i * i != k) // descending diagonal
+      return false;
+    if (g * g + e * e + c * c != k) // ascending diagonal
+      return false;
+    return true;
+}
 
 int main() {
+
+  int count = 0;
 
   log("Finding magic squares");
 
@@ -57,8 +80,6 @@ int main() {
       sq.insert(d);
 
       for (auto x : factors((b+d)*(b-d))) { // factors loop
-        if (std::abs(x) % 2 != std::abs((b+d)*(b-d) / x) % 2) // invalid factor
-          continue;
         g = (x + (b+d)*(b-d) / x) / 2;
         c = (x - (b+d)*(b-d) / x) / 2;
         if (sq.find(c) != sq.end() || sq.find(g) != sq.end() || c <= 0 || g <= 0) // duplicates
@@ -67,8 +88,7 @@ int main() {
         sq.insert(g);
 
         for (auto y : factors((g+b)*(g-b))) { // factors loop
-          if (std::abs(y) % 2 != std::abs((g+b)*(g-b) / y) % 2) // invalid factor
-            continue;
+          count++;
           a = (y + (g+b)*(g-b) / y) / 2;
           e = (y - (g+b)*(g-b) / y) / 2;
           if (sq.find(a) != sq.end() || sq.find(e) != sq.end() || e <= 0 || a <= 0) // duplicates
@@ -108,10 +128,11 @@ int main() {
           sq.erase(h);
           if (g * g + h * h + i * i != k) // bottom row
             continue;
-          if (a * a + e * e + i * i != k) // descending diagonal
-            continue;
+          // if (a * a + e * e + i * i != k) // descending diagonal
+          //   continue;
 
-          log(a, b, c, d, e, f, g, h, i, k);
+          if (check_magic_square(a, b, c, d, e, f, g, h, i))
+            log(a, b, c, d, e, f, g, h, i, k);
         }
 
         sq.erase(c);
@@ -125,6 +146,8 @@ int main() {
   }
 
   log("Ending");
+
+  std::cout << count << std::endl;
 
   return 0;
 

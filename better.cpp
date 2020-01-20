@@ -5,7 +5,7 @@
 #include <map> // std::map
 #include <string> // std::string
 
-#define MAX 10000
+#define MAX 300
 
 // Find the factors of n
 // Complexity is sqrt(n)
@@ -67,14 +67,14 @@ void log_magic_square(int a, int b, int c,
   }
 
 int main() {
-
-  log("Calculating factors");
-
-  // Precompute all factors of numbers in [1, 4*MAX**2] in MAX**3 time
-  std::map<int, std::set<int>> facts;
-  for (int x = 1; x < 4 * MAX * MAX; x++) {
-    facts.insert({x, factors(x)});
-  }
+  int count = 0;
+  // log("Calculating factors");
+  //
+  // // Precompute all factors of numbers in [1, 4*MAX**2] in MAX**3 time
+  // std::map<int, std::set<int>> facts;
+  // for (int x = 1; x < 4 * MAX * MAX; x++) {
+  //   facts.insert({x, factors(x)});
+  // }
 
   log("Finding magic squares");
 
@@ -90,7 +90,7 @@ int main() {
       x = b + d;
       y = b - d;
 
-      for (auto z : facts[x * y]) { // factors loop
+      for (auto z : factors(x, y)) { // factors loop
         if (z % 2 != x * y / z % 2 || z <= x * y / z)
           continue;
         g = (z + x * y / z) / 2;
@@ -101,6 +101,7 @@ int main() {
         sq.insert(g);
 
         for (a = 1; a <= MAX; a++) { // a loop
+          count++;
           if (sq.find(a) != sq.end()) continue;
           k = a * a + b * b + c * c;
           if (a * a + d * d + g * g != k) {
@@ -145,8 +146,8 @@ int main() {
           sq.erase(h);
           if (g * g + h * h + i * i != k) // bottom row
             continue;
-          if (a * a + e * e + i * i != k) // descending diagonal
-            continue;
+          // if (a * a + e * e + i * i != k) // descending diagonal
+          //   continue;
 
           // log_magic_square(a, b, c, d, e, f, g, h, i, k, a * a + e * e + i * i == k);
           log_magic_square(a, b, c, d, e, f, g, h, i, k);
@@ -162,6 +163,8 @@ int main() {
   }
 
   log("Ending");
+
+  std::cout << count << std::endl;
 
   return 0;
 

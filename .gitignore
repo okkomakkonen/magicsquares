@@ -1,5 +1,3 @@
 *.o
 squares.txt
-best
-better
-naive
+main
