@@ -3,12 +3,16 @@
 #include <unordered_set> // std::unordered_set
 #include <ctime> // std::time
 #include <string> // std::string
-#include <thread>
-#include <mutex>
+#include <thread> // std::thread
+#include <mutex> // std::mutex
+#include <vector> // std::vector
+
 #define MAX 10000
-#define NUM_THREADS 10
+#define NUM_THREADS 20
 
 std::mutex m;
+
+static std::vector<int> b_range;
 
 std::unordered_set<int> large_pos_factors(int n) {
   // n has to be positive
@@ -80,8 +84,8 @@ void search_magic_squares(int tid) {
   std::cout << "Thread " << tid << " starting" << std::endl;
   m.unlock();
 
-  int b_min = 2 + (MAX - 1) / NUM_THREADS * tid;
-  int b_max = 2 + (MAX - 1) / NUM_THREADS * (tid + 1) - 1;
+  int b_min = b_range[tid] + 1;
+  int b_max = b_range[tid + 1];
 
   int a, b, c, d, e, f, g, h, i, k;
 
@@ -146,8 +150,8 @@ void search_magic_squares(int tid) {
           sq.erase(h);
           if (g * g + h * h + i * i != k) // bottom row
             continue;
-          if (a * a + e * e + i * i != k) // descending diagonal
-            continue;
+          // if (a * a + e * e + i * i != k) // descending diagonal
+          //   continue;
 
           m.lock();
           log(a, b, c, d, e, f, g, h, i, k);
@@ -167,6 +171,19 @@ void search_magic_squares(int tid) {
 int main() {
 
   log("Finding magic squares");
+
+  b_range.push_back(1);
+  int count = 0;
+  for (int b = 2; b <= MAX; b++) {
+    if (count >= MAX*(MAX - 1)/(2*NUM_THREADS)) {
+      b_range.push_back(b);
+      count = 0;
+    }
+    for (int d = 1; d < b; d++) {
+      count++;
+    }
+  }
+  b_range.push_back(MAX);
 
   std::thread t[NUM_THREADS];
 
