@@ -20,3 +20,9 @@ new:
 	make clean
 	g++ new.cpp -o main
 	nohup ./main > squares.txt &
+
+multi:
+	make clean
+	g++ multithread.cpp -o main -pthread
+	nohup ./main > squares.txt &
+	
