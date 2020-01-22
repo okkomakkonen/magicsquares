@@ -7,17 +7,19 @@
 #include <mutex> // std::mutex
 #include <vector> // std::vector
 
-#define MAX 10000
-#define NUM_THREADS 20
+#define MAX 300
+#define NUM_THREADS 6
 
 std::mutex m;
 
-static std::vector<int> b_range;
+static std::vector<long long> b_range;
 
-std::unordered_set<int> large_pos_factors(int n) {
+static int magic_square_count = 0;
+
+std::unordered_set<long long> large_pos_factors(long long n) {
   // n has to be positive
-  std::unordered_set<int> res;
-  for (int i = 1; i < (int) std::sqrt(n); i++) {
+  std::unordered_set<long long> res;
+  for (long long i = 1; i < (long long) std::sqrt(n); i++) {
     if (n % i == 0 && i % 2 == (n / i) % 2) {
       res.insert(n / i);
     }
@@ -25,10 +27,10 @@ std::unordered_set<int> large_pos_factors(int n) {
   return res;
 }
 
-// Calculate the square root if it is an integer, else return zero
-int inv(int n) {
+// Calculate the square root if it is an long longeger, else return zero
+long long inv(long long n) {
   if (n < 0) return 0;
-  int r = std::sqrt(n);
+  long long r = std::sqrt(n);
   if (r * r == n)
     return r;
   return 0;
@@ -42,25 +44,10 @@ void log(std::string message) {
   std::cout << std::endl;
 }
 
-// Log a magic square to std::cout with a timestamp
-void log(int a, int b, int c,
-  int d, int e, int f, int g,
-  int h, int i, int k) {
-    std::time_t result = std::time(nullptr); // Current time
-    std::cout << std::asctime(std::localtime(&result));
-    std::cout << "Magic square of squares k = " << k << std::endl;
-    std::cout << a << " " << b << " " << c << std::endl;
-    std::cout << d << " " << e << " " << f << std::endl;
-    std::cout << g << " " << h << " " << i << std::endl;
-    if (a * a + e * e + i * i == k)
-      std::cout << "WORKING MAGIC SQUARE OF SQUARES" << std::endl;
-    std::cout << std::endl;
-}
-
-bool check_magic_square(int a, int b, int c,
-  int d, int e, int f, int g,
-  int h, int i) {
-    int k = a * a + b * b + c * c; // top row
+bool check_magic_square(long long a, long long b, long long c,
+  long long d, long long e, long long f, long long g,
+  long long h, long long i) {
+    long long k = a * a + b * b + c * c; // top row
     if (d * d + e * e + f * f != k) // middle row
       return false;
     if (g * g + h * h + i * i != k) // bottom row
@@ -78,18 +65,29 @@ bool check_magic_square(int a, int b, int c,
     return true;
 }
 
+// Log a magic square to std::cout with a timestamp
+void log(long long a, long long b, long long c, long long d, long long e, long long f, long long g, long long h, long long i, long long k) {
+  if (check_magic_square(a, b, c, d, e, f, g, h, i) || true) {
+    std::time_t result = std::time(nullptr); // Current time
+    std::cout << std::asctime(std::localtime(&result));
+    std::cout << "Magic square of squares k = " << k << std::endl;
+    std::cout << a << " " << b << " " << c << std::endl;
+    std::cout << d << " " << e << " " << f << std::endl;
+    std::cout << g << " " << h << " " << i << std::endl;
+    if (a * a + e * e + i * i == k)
+      std::cout << "WORKING MAGIC SQUARE OF SQUARES" << std::endl;
+    std::cout << std::endl;
+  }
+}
+
 void search_magic_squares(int tid) {
 
-  m.lock();
-  std::cout << "Thread " << tid << " starting" << std::endl;
-  m.unlock();
+  long long b_min = b_range[tid] + 1;
+  long long b_max = b_range[tid + 1];
 
-  int b_min = b_range[tid] + 1;
-  int b_max = b_range[tid + 1];
+  long long a, b, c, d, e, f, g, h, i, k;
 
-  int a, b, c, d, e, f, g, h, i, k;
-
-  std::unordered_set<int> sq; // Set of all numbers in the magic square
+  std::unordered_set<long long> sq; // Set of all numbers in the magic square
 
   for (b = b_min; b <= b_max; b++) { // b loop
     sq.insert(b);
@@ -155,6 +153,8 @@ void search_magic_squares(int tid) {
 
           m.lock();
           log(a, b, c, d, e, f, g, h, i, k);
+          if (check_magic_square(a, b, c, d, e, f, g, h, i))
+            magic_square_count++;
           m.unlock();
         }
 
@@ -173,17 +173,19 @@ int main() {
   log("Finding magic squares");
 
   b_range.push_back(1);
-  int count = 0;
-  for (int b = 2; b <= MAX; b++) {
-    if (count >= MAX*(MAX - 1)/(2*NUM_THREADS)) {
+  long long count = 0;
+  for (long long b = 2; b <= MAX; b++) {
+    if (count >= MAX/NUM_THREADS * (MAX - 1)/2) {
       b_range.push_back(b);
       count = 0;
     }
-    for (int d = 1; d < b; d++) {
+    for (long long d = 1; d < b; d++) {
       count++;
     }
   }
   b_range.push_back(MAX);
+
+  // for (auto b : b_range) std::cout << b << std::endl;
 
   std::thread t[NUM_THREADS];
 
@@ -196,6 +198,7 @@ int main() {
   }
 
   log("Ending");
+  std::cout << "Found " << magic_square_count << " magic squares" << std::endl;
 
   return 0;
 }
