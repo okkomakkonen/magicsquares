@@ -1,28 +1,22 @@
 clean:
 	if [ -f "main" ]; then rm main; fi
 
-naive:
+algo1:
 	make clean
-	g++ naive.cpp -o main
-	nohup ./main > squares.txt &
+	g++ algorithms/algo1.cpp -o main
 
-better:
+algo2:
 	make clean
-	g++ better.cpp -o main
-	nohup ./main > squares.txt &
+	g++ algorithms/algo2.cpp -o main
 
-best:
+algo3:
 	make clean
-	g++ best.cpp factors.cpp -o main
-	nohup ./main > squares.txt &
+	g++ algorithms/algo3.cpp -o main
 
-new:
+algo4:
 	make clean
-	g++ new.cpp -o main
-	nohup ./main > squares.txt &
+	g++ algorithms/algo4.cpp -o main -pthread
 
-multi:
+algo5:
 	make clean
-	g++ multithread.cpp -o main -pthread
-	nohup ./main > squares.txt &
-	
+	g++ algorithms/algo5.cpp -o main -pthread
