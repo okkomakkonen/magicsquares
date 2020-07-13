@@ -2,17 +2,28 @@
 
 A script for finding magic squares of squares.
 
+## Usage
+
+To run the program write the following commands in this folder. This runs algorithm 5 to 1000 using 4 cores.
+```bash
+make algo5
+./main 1000 4 > out.txt
+```
+
+## Basics
+
 Magic squares are a grid of 3x3 integers such that the sum of all rows columns
 and diagonals equals the same value. Additionally one could restrain the values
 to be unique.
 
 A magic square of squares has elements a to i in the following pattern.
 
-a b c  
-d e f  
-g h i  
+| **a** | **b** | **c** |
+|-------|-------|-------|
+| **d** | **e** | **f** |
+| **g** | **h** | **i** |
 
-These values are not the squared yet, so a^2 + b^2 + c^2 = k, would be the
+These values are not the squared yet, so a² + b² + c² = k, would be the
 sum of the top row. The value of the sum of the magic square is denoted with k.
 
 This notation is used throughout.
@@ -36,3 +47,4 @@ for those values of a, b, c and d. In total you have to check about N^4 combinat
 for a, b, c and d.
 
 ### A solution based on integer factoring (algorithm 5)
+First choose values for c and g. Then find the factors of c² - g² = (d - b)(d + b) = (h - f)(h + f). Using these factors it is possible to find d, b, h, f. Finally the values can be found.

@@ -9,6 +9,7 @@
 
 static int MAX = 100; // Maximum value for c
 static int NUM_THREADS = 1;
+static bool SKIP_CHECK = true;
 
 std::mutex m; // Lock for multithreading
 
@@ -85,6 +86,8 @@ void log(long long a, long long b, long long c, long long d, long long e, long l
     std::cout << g << " " << h << " " << i << std::endl;
     if (check_magic_square(a, b, c, d, e, f, g, h, i))
       std::cout << "WORKING MAGIC SQUARE OF SQUARES" << std::endl;
+    else
+      std::cout << "NOT A WORKING MAGIC SQUARE OF SQUARES" << std::endl;
     if (is_primitive(a, b, c, d, e, f, g, h, i))
       std::cout << "THIS IS A PRIMITIVE MAGIC SQUARE" << std::endl;
     std::cout << std::endl;
@@ -158,10 +161,12 @@ void search_magic_squares(long long tid) {
           sq.erase(a);
           sq.erase(e);
 
-          if (is_primitive(a, b, c, d, e, f, g, h, i) || check_magic_square(a, b, c, d, e, f, g, h, i)) {
-            m.lock();
-            log(a, b, c, d, e, f, g, h, i, k);
-            m.unlock();
+          if (is_primitive(a, b, c, d, e, f, g, h, i)) {
+            if (SKIP_CHECK || check_magic_square(a, b, c, d, e, f, g, h, i)) {
+              m.lock();
+              log(a, b, c, d, e, f, g, h, i, k);
+              m.unlock();
+            }
           }
 
         } // f and h loop
@@ -186,7 +191,7 @@ int main(int argc, char* argv[]) {
   if (argc > 2)
     NUM_THREADS = std::stoi(argv[2]);
 
-  std::cout << "Calculating upto " << MAX << ", with " << NUM_THREADS << std::endl;
+  std::cout << "Calculating upto " << MAX << ", with " << NUM_THREADS << " cores" << std::endl;
 
   log("Finding magic squares");
 
