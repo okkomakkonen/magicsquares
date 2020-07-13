@@ -7,7 +7,7 @@
 // #include <mutex> // std::mutex
 #include <algorithm> // std::__gcd
 
-#define MAX 100
+static int MAX = 100;
 
 std::vector<int> small_pos_factors_parity(int n) {
   std::vector<int> res;

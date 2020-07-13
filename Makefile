@@ -20,3 +20,7 @@ algo4:
 algo5:
 	make clean
 	g++ algorithms/algo5.cpp -o main -pthread
+
+test5:
+	make clean
+	g++ tests/test5.cpp -o test

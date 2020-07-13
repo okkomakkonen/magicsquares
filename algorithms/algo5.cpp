@@ -1,16 +1,16 @@
-#include <iostream>   // std::cout, std::endl
-#include <set>        // std::set
-#include <vector>     // std::vector
-#include <cmath>      // std::sqrt
-#include <ctime>      // std::time
-#include <thread>     // std::thread
-#include <mutex>      // std::mutex
-#include <algorithm>  // std::__gcd
+#include <iostream>       // std::cout, std::endl
+#include <unordered_set>  // std::unordered_set
+#include <vector>         // std::vector
+#include <cmath>          // std::sqrt
+#include <ctime>          // std::time
+#include <thread>         // std::thread
+#include <mutex>          // std::mutex
+#include <algorithm>      // std::__gcd
 
-static int MAX = 100;
+static int MAX = 100; // Maximum value for c
 static int NUM_THREADS = 1;
 
-std::mutex m;
+std::mutex m; // Lock for multithreading
 
 static std::vector<long long> c_range; // ranges for the values of c for different threads
 
@@ -100,17 +100,17 @@ void search_magic_squares(long long tid) {
   long long k; // square sum
   long long cg; // c^2 - g^2
 
-  std::set<long long> sq;
+  std::unordered_set<long long> sq;
 
-  for (long long c = c_min; c <= c_max; c++) { // c loop
+  for (c = c_min; c <= c_max; c++) { // c loop
     sq.insert(c);
 
-    for (long long g = c % 2 ? 1 : 2; g < c; g += 2) { // g loop, g has to be of same parity
+    for (g = c % 2 ? 1 : 2; g < c; g += 2) { // g loop, g has to be of same parity
       sq.insert(g);
 
       cg = c * c - g * g; // (c + g) * (c - g)
       auto cg_factors = small_pos_factors_parity(cg);
-      for (int j = 1; j < cg_factors.size(); j++) { // b and d loop
+      for (auto j = 1; j < cg_factors.size(); j++) { // b and d loop
         d = (cg / cg_factors[j] + cg_factors[j]) / 2;
         b = (cg / cg_factors[j] - cg_factors[j]) / 2;
         if (b % 2 != d % 2) continue;
@@ -118,7 +118,7 @@ void search_magic_squares(long long tid) {
         sq.insert(d);
         sq.insert(b);
 
-        for (int l = 0; l < j; l++) { // f and h loop
+        for (auto l = 0; l < j; l++) { // f and h loop
           h = (cg / cg_factors[l] + cg_factors[l]) / 2;
           f = (cg / cg_factors[l] - cg_factors[l]) / 2;
           if (h % 2 != f % 2) continue;
@@ -185,6 +185,8 @@ int main(int argc, char* argv[]) {
     MAX = std::stoi(argv[1]);
   if (argc > 2)
     NUM_THREADS = std::stoi(argv[2]);
+
+  std::cout << "Calculating upto " << MAX << ", with " << NUM_THREADS << std::endl;
 
   log("Finding magic squares");
 
