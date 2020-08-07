@@ -15,6 +15,8 @@ std::mutex m; // Lock for multithreading
 
 static std::vector<long long> c_range; // ranges for the values of c for different threads
 
+// Returns a vector of positive factors of n that are smaller than their complement
+// Also filters out those with incorrect parity
 std::vector<long long> small_pos_factors_parity(long long n) {
   std::vector<long long> res;
   for (long long i = 1; i * i < n; i++) {
@@ -24,14 +26,16 @@ std::vector<long long> small_pos_factors_parity(long long n) {
   return res;
 }
 
-long long inv(long long n) {
-  if (n < 0) return 0;
+// Performs integer square root
+long long int_sqrt(long long n) {
+  if (n <= 0) return 0;
   long long r = std::sqrt(n);
   if (r * r == n)
     return r;
   return 0;
 }
 
+// Checks that a magic square is working
 bool check_magic_square(long long a, long long b, long long c,
   long long d, long long e, long long f, long long g,
   long long h, long long i) {
@@ -131,7 +135,7 @@ void search_magic_squares(long long tid) {
           sq.insert(f);
 
           k = c * c + b * b + (f * f + h * h) / 2;
-          a = inv(k - b * b - c * c);
+          a = int_sqrt(k - b * b - c * c);
           if (a == 0 || sq.find(a) != sq.end()) {
             sq.erase(h);
             sq.erase(f);
@@ -139,7 +143,7 @@ void search_magic_squares(long long tid) {
           }
           sq.insert(a);
 
-          e = inv(k - b * b - h * h);
+          e = int_sqrt(k - b * b - h * h);
           if (e == 0 || sq.find(e) != sq.end()) {
             sq.erase(h);
             sq.erase(f);
@@ -148,7 +152,7 @@ void search_magic_squares(long long tid) {
           }
           sq.insert(e);
 
-          i = inv(k - c * c - f * f);
+          i = int_sqrt(k - c * c - f * f);
           if (i == 0 || sq.find(i) != sq.end()) {
             sq.erase(h);
             sq.erase(f);
@@ -191,7 +195,7 @@ int main(int argc, char* argv[]) {
   if (argc > 2)
     NUM_THREADS = std::stoi(argv[2]);
 
-  std::cout << "Calculating upto " << MAX << ", with " << NUM_THREADS << " cores" << std::endl;
+  std::cout << "Calculating upto " << MAX << ", with " << NUM_THREADS << " threads" << std::endl;
 
   log("Finding magic squares");
 
